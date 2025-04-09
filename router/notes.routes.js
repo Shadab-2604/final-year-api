@@ -4,7 +4,7 @@ import { upload } from "../middleware/multer.middleware.js";
 
 const router = express.Router();
 
-router.post('/', upload.single('notesFile'), createNote);
+router.post('/upload', upload.single('notesFile'), createNote);
 router.get('/', getNotes);
 router.put('/:id', upload.single('notesFile'), updateNote);
 router.delete('/:id', deleteNote);
