@@ -3,518 +3,1205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notes API Client</title>
+    <title>Notes API Management Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --text: #2c3e50;
+            --border: #bdc3c7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f7f9fc;
-            color: #333;
+            color: var(--text);
+            background-color: #f5f7fa;
+            line-height: 1.6;
         }
-        .page-title {
-            text-align: center;
-            color: #2c3e50;
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
-        .container {
-            max-width: 700px;
-            margin: 0 auto 25px;
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .card {
             background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
         }
-        .section-title {
-            margin-top: 0;
-            color: #2c3e50;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
         }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            box-sizing: border-box;
-            font-family: inherit;
-            transition: border 0.3s ease;
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
         }
-        .file-input-container {
-            margin: 10px 0;
+        
+        .tab-content {
+            display: none;
         }
-        button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .btn {
+            padding: 10px 18px;
             border-radius: 6px;
             border: none;
-            background-color: #3498db;
-            color: white;
             cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        button:hover {
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
             background-color: #2980b9;
         }
-        button.delete-btn {
-            background-color: #e74c3c;
-            width: auto;
-            padding: 8px 12px;
-            margin-top: 5px;
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
         }
-        button.delete-btn:hover {
+        
+        .btn-danger:hover {
             background-color: #c0392b;
         }
-        .note {
-            background: #f8f9fa;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
-        .note h4 {
-            margin-top: 0;
-            color: #2c3e50;
+        
+        .notes-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
-        .note p {
-            margin: 10px 0;
-            color: #555;
+        
+        .note-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 16px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
         }
-        .file-link {
-            display: inline-block;
-            margin: 5px 0;
-            color: #3498db;
-            text-decoration: none;
+        
+        .note-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        
+        .note-title {
+            font-weight: 600;
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+        
+        .note-meta {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .note-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .note-desc {
+            font-size: 14px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        
+        .note-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .view-modal {
+            max-width: 800px;
+        }
+        
+        .modal-backdrop.active .modal {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: 500;
         }
-        .file-link:hover {
-            text-decoration: underline;
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
         }
-        .note-actions {
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+        
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+        
+        .file-upload .icon {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .file-upload .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .response-container {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: "Monaco", "Menlo", "Consolas", monospace;
+            font-size: 13px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-grid .form-group:last-child {
+            grid-column: span 2;
+        }
+        
+        .two-col {
+            grid-column: span 2;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            display: none;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .loading .spinner {
+            display: inline-block;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        /* View Modal Styles */
+        .view-modal-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .view-modal-image {
+            text-align: center;
+        }
+        
+        .note-image-preview {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 15px;
+            object-fit: contain;
+        }
+        
+        #noImageMessage {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .view-modal-details {
+            font-size: 14px;
+        }
+        
+        .detail-item {
+            margin-bottom: 12px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .view-modal-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid .form-group:last-child {
+                grid-column: span 1;
+            }
+        }
+        .image-carousel {
+            position: relative;
+            margin-top: 15px;
+        }
+
+        .carousel-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 8px;
+            object-fit: contain;
+            display: none;
+        }
+
+        .carousel-image.active {
+            display: block;
+        }
+
+        .carousel-controls {
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
         }
-        .file-actions {
-            display: flex;
-            gap: 10px;
-            margin: 8px 0;
-        }
-        .view-btn, .download-btn {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
+
+        .carousel-arrow {
+            background: rgba(0, 0, 0, 0.5);
             color: white;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .view-btn {
-            background-color: #3498db;
-        }
-        .view-btn:hover {
-            background-color: #2980b9;
-        }
-        .download-btn {
-            background-color: #27ae60;
-        }
-        .download-btn:hover {
-            background-color: #219653;
-        }
-        .status-message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            text-align: center;
-            display: none;
-        }
-        .status-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .status-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
-        .loading:after {
-            content: "Loading...";
-            color: #666;
-        }
-        .no-notes {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-style: italic;
-        }
-        .btn-container {
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
             display: flex;
-            gap: 10px;
-            justify-content: flex-end;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .btn-sm {
-            width: auto;
-            padding: 8px 12px;
-            margin: 0;
-            font-size: 14px;
+
+        .carousel-arrow:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .carousel-counter {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .no-images-message {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1 class="page-title">Notes API Client</h1>
-
+    <header>
+        <div class="container header-content">
+            <h1><i class="fas fa-book-open"></i> Notes API Management Portal</h1>
+        </div>
+    </header>
+    
     <div class="container">
-        <h3 class="section-title">Create a New Note</h3>
-        <form id="uploadForm">
-            <input type="text" id="noteTitle" placeholder="Title" required>
-            <textarea id="noteDescription" placeholder="Description" rows="4"></textarea>
-            <div class="file-input-container">
-                <input type="file" id="noteFile">
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" data-tab="notes-list">All Notes</div>
+                <div class="tab" data-tab="response-view">API Response</div>
             </div>
-            <button type="submit">Upload Note</button>
-        </form>
-        <div id="uploadStatus" class="status-message"></div>
-    </div>
-
-    <div class="container">
-        <h3 class="section-title">Search Notes</h3>
-        <form id="searchForm">
-            <input type="text" id="searchQuery" placeholder="Search by title">
-            <button type="submit">Search</button>
-        </form>
-    </div>
-
-    <div class="container">
-        <h3 class="section-title">My Notes</h3>
-        <button id="loadNotesBtn">Load All Notes</button>
-        <div id="loadingNotes" class="loading"></div>
-        <div id="notesStatus" class="status-message"></div>
-        <div id="notesList"></div>
-    </div>
-
-    <script>
-        // API Base URL - make sure this matches your backend
-        const API_URL = "http://localhost:8000/notes";
-        const SERVER_BASE_URL = "http://localhost:8000";
-        
-        // DOM Elements
-        const uploadForm = document.getElementById("uploadForm");
-        const searchForm = document.getElementById("searchForm");
-        const loadNotesBtn = document.getElementById("loadNotesBtn");
-        const uploadStatus = document.getElementById("uploadStatus");
-        const notesStatus = document.getElementById("notesStatus");
-        const loadingNotes = document.getElementById("loadingNotes");
-        const notesList = document.getElementById("notesList");
-
-        // Helper functions
-        function showMessage(element, message, isError = false) {
-            element.textContent = message;
-            element.className = "status-message";
-            element.classList.add(isError ? "status-error" : "status-success");
-            element.style.display = "block";
             
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                element.style.display = "none";
-            }, 5000);
-        }
-
-        // Fix file path to make it accessible through the API
-        function fixFilePath(path) {
-            if (!path) return '';
-            
-            // Remove any absolute path prefixes that might be in the database
-            // This extracts just the filename part or the relative path
-            let normalizedPath = path;
-            
-            // Handle Windows-style paths like E:/Final-Year/Shadab-api/public/uploads/filename.pdf
-            if (path.includes(':/')) {
-                // Extract just the uploads/filename part
-                const matches = path.match(/.*\/public\/(.+)/);
-                if (matches && matches[1]) {
-                    normalizedPath = matches[1];
-                } else {
-                    // Fallback to just the filename
-                    normalizedPath = path.split('/').pop();
-                }
-            }
-            
-            // Make the path relative to the server root
-            if (normalizedPath.startsWith('/')) {
-                normalizedPath = normalizedPath.substring(1);
-            }
-            
-            // Return full URL to the file
-            return `${SERVER_BASE_URL}/${normalizedPath}`;
-        }
-
-        function renderNotes(notes) {
-            notesList.innerHTML = "";
-            
-            if (!notes || notes.length === 0) {
-                notesList.innerHTML = '<div class="no-notes">No notes found.</div>';
-                return;
-            }
-            
-            notes.forEach(note => {
-                // Fix the file path to be accessible through the API
-                let filePath = fixFilePath(note.filePath);
-                console.log("Original path:", note.filePath);
-                console.log("Fixed path:", filePath);
+            <div class="tab-content active" id="notes-list">
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="openCreateModal"><i class="fas fa-plus"></i> Create New Note</button>
+                    <button class="btn btn-primary" id="refreshNotes"><i class="fas fa-sync-alt"></i> Refresh List</button>
+                </div>
                 
-                // Prepare file actions HTML
-                let fileActionsHtml = '<span>No attachment</span>';
-                if (note.filePath) {
-                    // Get the filename from the path
-                    const fileName = note.filePath.split('/').pop() || 'file';
+                <div class="notes-list" id="notesContainer">
+                    <div class="note-card">
+                        <div class="note-title">Loading notes...</div>
+                        <div class="note-meta">Please wait while we fetch your notes.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="response-view">
+                <div class="response-container">
+                    <div class="response-header">
+                        <h3>API Response Data</h3>
+                        <button class="btn btn-primary" id="clearResponse"><i class="fas fa-eraser"></i> Clear</button>
+                    </div>
+                    <pre id="response">No API responses yet.</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Note Modal -->
+    <div class="modal-backdrop" id="createModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Create New Note</div>
+                <button class="modal-close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" class="form-control" placeholder="Enter title" required>
+                    </div>
                     
-                    fileActionsHtml = `
-                        <div class="file-actions">
-                            <a href="${filePath}" class="view-btn" target="_blank" rel="noopener">View</a>
-                            <a href="${filePath}" class="download-btn" download="${fileName}">Download</a>
+                    <div class="form-group">
+                        <label for="course">Course</label>
+                        <input type="text" id="course" class="form-control" placeholder="Enter course" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" class="form-control" placeholder="Enter subject" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="year">Year</label>
+                        <input type="number" id="year" class="form-control" placeholder="Enter year" required>
+                    </div>
+                    
+                    <div class="form-group two-col">
+                        <label for="notesText">Text Content</label>
+                        <input type="text" id="notesText" class="form-control" placeholder="Enter text content">
+                    </div>
+                    
+                    <div class="form-group two-col">
+                        <label for="description">Description</label>
+                        <textarea id="description" class="form-control" placeholder="Enter description"></textarea>
+                    </div>
+                    
+                    <div class="form-group two-col">
+                        <label>Upload File</label>
+                        <div class="file-upload">
+                            <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div>Drag and drop your file here or click to select</div>
+                            <input type="file" id="notesFile">
+                            <div class="file-name" id="create-file-name">No file selected</div>
                         </div>
-                    `;
-                }
-                
-                const noteId = note._id || note.id || ''; // Handle different ID formats
-                
-                notesList.innerHTML += `
-                    <div class="note" data-id="${noteId}">
-                        <h4>${escapeHTML(note.title || 'Untitled')}</h4>
-                        <p>${escapeHTML(note.description || 'No description')}</p>
-                        ${fileActionsHtml}
-                        <div class="note-actions">
-                            <div class="btn-container">
-                                <button class="delete-btn btn-sm" data-id="${noteId}">Delete</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="createNoteBtn">
+                    <span class="spinner"></span>
+                    <i class="fas fa-save"></i> Create Note
+                </button>
+                <button class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Note Modal -->
+    <div class="modal-backdrop" id="viewModal">
+        <div class="modal view-modal">
+            <div class="modal-header">
+                <div class="modal-title">Note Details</div>
+                <button class="modal-close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="view-modal-content">
+                    <div class="view-modal-image">
+                        <div class="image-carousel" id="imageCarousel">
+                            <!-- Images will be dynamically inserted here -->
+                            <div class="no-images-message" id="noImageMessage">
+                                <i class="fas fa-image" style="font-size: 24px; margin-bottom: 8px;"></i>
+                                <div>No images attached to this note</div>
                             </div>
                         </div>
                     </div>
-                `;
+                    <div class="view-modal-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Title</div>
+                            <div class="detail-value" id="viewTitle">-</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Course</div>
+                            <div class="detail-value" id="viewCourse">-</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Subject</div>
+                            <div class="detail-value" id="viewSubject">-</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Year</div>
+                            <div class="detail-value" id="viewYear">-</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Description</div>
+                            <div class="detail-value" id="viewDescription">No description available</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Text Content</div>
+                            <div class="detail-value" id="viewNotesText">No text content available</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Created Date</div>
+                            <div class="detail-value" id="viewDate">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Update Note Modal -->
+    <div class="modal-backdrop" id="updateModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Update Note</div>
+                <button class="modal-close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="updateId">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="updateTitle">Title</label>
+                        <input type="text" id="updateTitle" class="form-control" placeholder="Update title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateCourse">Course</label>
+                        <input type="text" id="updateCourse" class="form-control" placeholder="Update course" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateSubject">Subject</label>
+                        <input type="text" id="updateSubject" class="form-control" placeholder="Update subject" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateYear">Year</label>
+                        <input type="number" id="updateYear" class="form-control" placeholder="Update year" required>
+                    </div>
+                    
+                    <div class="form-group two-col">
+                        <label for="updateNotesText">Text Content</label>
+                        <input type="text" id="updateNotesText" class="form-control" placeholder="Update text content">
+                    </div>
+                    
+                    <div class="form-group two-col">
+                        <label for="updateDescription">Description</label>
+                        <textarea id="updateDescription" class="form-control" placeholder="Update description"></textarea>
+                    </div>
+                    
+                    <div class="form-group two-col">
+                        <label>Update File</label>
+                        <div class="file-upload">
+                            <div class="icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <div>Drag and drop your file here or click to select</div>
+                            <input type="file" id="updateFile">
+                            <div class="file-name" id="update-file-name">No file selected</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="updateNoteBtn">
+                    <span class="spinner"></span>
+                    <i class="fas fa-save"></i> Update Note
+                </button>
+                <button class="btn btn-danger" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-backdrop" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Confirm Deletion</div>
+                <button class="modal-close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="deleteId">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        Are you sure you want to delete this note? This action cannot be undone.
+                        <p><strong id="deleteNoteTitle"></strong></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="confirmDeleteBtn">
+                    <span class="spinner"></span>
+                    <i class="fas fa-trash"></i> Delete Note
+                </button>
+                <button class="btn btn-primary" data-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/notes';
+        let currentNotes = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize
+            getNotes();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tabId = this.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId).classList.add('active');
+                });
             });
             
-            // Add event listeners to delete buttons
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const noteId = this.getAttribute('data-id');
-                    if (confirm('Are you sure you want to delete this note?')) {
-                        deleteNote(noteId);
+            // Modal controls
+            document.querySelectorAll('[data-dismiss="modal"]').forEach(btn => {
+                btn.addEventListener('click', closeModals);
+            });
+            
+            // Close modals when clicking backdrop
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                backdrop.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModals();
                     }
                 });
             });
+            
+            // Open create modal
+            document.getElementById('openCreateModal').addEventListener('click', function() {
+                document.getElementById('createModal').classList.add('active');
+            });
+            
+            // Create note
+            document.getElementById('createNoteBtn').addEventListener('click', createNote);
+            
+            // Update note
+            document.getElementById('updateNoteBtn').addEventListener('click', updateNote);
+            
+            // Confirm delete
+            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteNote);
+            
+            // Refresh notes
+            document.getElementById('refreshNotes').addEventListener('click', getNotes);
+            
+            // Clear response
+            document.getElementById('clearResponse').addEventListener('click', function() {
+                document.getElementById('response').textContent = 'Response cleared.';
+            });
+            
+            // File upload UI display
+            document.getElementById('notesFile').addEventListener('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'No file selected';
+                document.getElementById('create-file-name').textContent = fileName;
+            });
+            
+            document.getElementById('updateFile').addEventListener('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'No file selected';
+                document.getElementById('update-file-name').textContent = fileName;
+            });
+        }
+        
+        function closeModals() {
+            document.querySelectorAll('.modal-backdrop').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+        
+        function displayResponse(data) {
+            document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+            // Switch to response tab
+            document.querySelector('[data-tab="response-view"]').click();
+        }
+        
+        async function createNote() {
+            const createBtn = document.getElementById('createNoteBtn');
+            createBtn.classList.add('loading');
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('notesText', document.getElementById('notesText').value);
+            formData.append('course', document.getElementById('course').value);
+            formData.append('year', document.getElementById('year').value);
+            formData.append('subject', document.getElementById('subject').value);
+            
+            const fileInput = document.getElementById('notesFile');
+            if (fileInput.files[0]) {
+                formData.append('notesFile', fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResponse(data);
+                    closeModals();
+                    getNotes(); // Refresh the notes list
+                    
+                    // Clear form
+                    document.getElementById('title').value = '';
+                    document.getElementById('description').value = '';
+                    document.getElementById('notesText').value = '';
+                    document.getElementById('course').value = '';
+                    document.getElementById('year').value = '';
+                    document.getElementById('subject').value = '';
+                    document.getElementById('notesFile').value = '';
+                    document.getElementById('create-file-name').textContent = 'No file selected';
+                } else {
+                    displayResponse(data);
+                }
+            } catch (error) {
+                displayResponse({ error: error.message });
+            } finally {
+                createBtn.classList.remove('loading');
+            }
         }
 
-        function escapeHTML(str) {
-            if (!str) return '';
-            return String(str)
+        async function getNotes() {
+            const refreshBtn = document.getElementById('refreshNotes');
+            refreshBtn.classList.add('loading');
+            
+            try {
+                const response = await fetch(API_BASE);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentNotes = data;
+                    displayResponse(data);
+                    renderNotes(data);
+                } else {
+                    displayResponse(data);
+                    document.getElementById('notesContainer').innerHTML = `
+                        <div class="note-card">
+                            <div class="note-title">Error loading notes</div>
+                            <div class="note-desc">${data.message || 'Unknown error occurred'}</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                displayResponse({ error: error.message });
+                document.getElementById('notesContainer').innerHTML = `
+                    <div class="note-card">
+                        <div class="note-title">Error loading notes</div>
+                        <div class="note-desc">${error.message}</div>
+                    </div>
+                `;
+            } finally {
+                refreshBtn.classList.remove('loading');
+            }
+        }
+
+        function openViewModal(id) {
+            const note = currentNotes.find(note => note._id === id);
+            if (!note) return;
+
+            // Populate view modal details
+            document.getElementById('viewTitle').textContent = note.title || 'Untitled Note';
+            document.getElementById('viewCourse').textContent = note.course || '-';
+            document.getElementById('viewSubject').textContent = note.subject || '-';
+            document.getElementById('viewYear').textContent = note.year || '-';
+            document.getElementById('viewDescription').textContent = note.description || 'No description available';
+            document.getElementById('viewNotesText').textContent = note.notesText || 'No text content available';
+            document.getElementById('viewDate').textContent = note.date ? new Date(note.date).toLocaleString() : '-';
+
+            // Handle images
+            const carousel = document.getElementById('imageCarousel');
+            const noImageMessage = document.getElementById('noImageMessage');
+            
+            // Clear previous images
+            carousel.querySelectorAll('.carousel-image, .carousel-controls, .carousel-counter').forEach(el => el.remove());
+            
+            // Check if we have images (handles both single image and array of images)
+            let images = [];
+            if (note.images) {
+                if (Array.isArray(note.images)) {
+                    images = note.images;
+                } else if (note.images.url) {
+                    images = [note.images]; // Convert single image to array
+                }
+            }
+
+            if (images.length > 0) {
+                noImageMessage.style.display = 'none';
+                
+                // Create image elements
+                images.forEach((img, index) => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = img.url;
+                    imgElement.alt = `Note image ${index + 1}`;
+                    imgElement.classList.add('carousel-image');
+                    if (index === 0) imgElement.classList.add('active');
+                    carousel.insertBefore(imgElement, noImageMessage);
+                });
+
+                // Create controls if more than one image
+                if (images.length > 1) {
+                    const controlsDiv = document.createElement('div');
+                    controlsDiv.classList.add('carousel-controls');
+                    
+                    const prevButton = document.createElement('button');
+                    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                    prevButton.classList.add('carousel-arrow');
+                    prevButton.addEventListener('click', () => navigateCarousel(-1));
+                    
+                    const nextButton = document.createElement('button');
+                    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                    nextButton.classList.add('carousel-arrow');
+                    nextButton.addEventListener('click', () => navigateCarousel(1));
+                    
+                    controlsDiv.appendChild(prevButton);
+                    controlsDiv.appendChild(nextButton);
+                    carousel.appendChild(controlsDiv);
+                    
+                    // Add counter
+                    const counter = document.createElement('div');
+                    counter.classList.add('carousel-counter');
+                    counter.textContent = `1/${images.length}`;
+                    carousel.appendChild(counter);
+                    
+                    // Store current index as data attribute
+                    carousel.setAttribute('data-current-index', '0');
+                }
+            } else {
+                noImageMessage.style.display = 'block';
+            }
+
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function navigateCarousel(direction) {
+            const carousel = document.getElementById('imageCarousel');
+            const images = carousel.querySelectorAll('.carousel-image');
+            let currentIndex = parseInt(carousel.getAttribute('data-current-index')) || 0;
+            const totalImages = images.length;
+            
+            // Calculate new index
+            currentIndex += direction;
+            if (currentIndex >= totalImages) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = totalImages - 1;
+            
+            // Update display
+            images.forEach((img, index) => {
+                img.classList.toggle('active', index === currentIndex);
+            });
+            
+            // Update counter
+            const counter = carousel.querySelector('.carousel-counter');
+            if (counter) {
+                counter.textContent = `${currentIndex + 1}/${totalImages}`;
+            }
+            
+            // Store current index
+            carousel.setAttribute('data-current-index', currentIndex.toString());
+        }
+
+        function openUpdateModal(id) {
+            const note = currentNotes.find(note => note._id === id);
+            if (!note) return;
+            
+            document.getElementById('updateId').value = note._id;
+            document.getElementById('updateTitle').value = note.title || '';
+            document.getElementById('updateDescription').value = note.description || '';
+            document.getElementById('updateNotesText').value = note.notesText || '';
+            document.getElementById('updateCourse').value = note.course || '';
+            document.getElementById('updateYear').value = note.year || '';
+            document.getElementById('updateSubject').value = note.subject || '';
+            document.getElementById('update-file-name').textContent = note.images?.url ? 'Current file attached' : 'No file selected';
+            
+            document.getElementById('updateModal').classList.add('active');
+        }
+
+        function openDeleteModal(id) {
+            const note = currentNotes.find(note => note._id === id);
+            if (!note) return;
+            
+            document.getElementById('deleteId').value = note._id;
+            document.getElementById('deleteNoteTitle').textContent = note.title || 'Untitled Note';
+            
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        async function updateNote() {
+            const updateBtn = document.getElementById('updateNoteBtn');
+            updateBtn.classList.add('loading');
+            
+            const noteId = document.getElementById('updateId').value;
+            const formData = new FormData();
+            formData.append('title', document.getElementById('updateTitle').value);
+            formData.append('description', document.getElementById('updateDescription').value);
+            formData.append('notesText', document.getElementById('updateNotesText').value);
+            formData.append('course', document.getElementById('updateCourse').value);
+            formData.append('year', document.getElementById('updateYear').value);
+            formData.append('subject', document.getElementById('updateSubject').value);
+            
+            const fileInput = document.getElementById('updateFile');
+            if (fileInput.files[0]) {
+                formData.append('notesFile', fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/${noteId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResponse(data);
+                    closeModals();
+                    getNotes(); // Refresh the notes list
+                } else {
+                    displayResponse(data);
+                }
+            } catch (error) {
+                displayResponse({ error: error.message });
+            } finally {
+                updateBtn.classList.remove('loading');
+            }
+        }
+
+        async function deleteNote() {
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            deleteBtn.classList.add('loading');
+            
+            const noteId = document.getElementById('deleteId').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/${noteId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResponse(data);
+                    closeModals();
+                    getNotes(); // Refresh the notes list
+                } else {
+                    displayResponse(data);
+                }
+            } catch (error) {
+                displayResponse({ error: error.message });
+            } finally {
+                deleteBtn.classList.remove('loading');
+            }
+        }
+
+        function renderNotes(notes) {
+            if (!Array.isArray(notes) || notes.length === 0) {
+                document.getElementById('notesContainer').innerHTML = `
+                    <div class="note-card">
+                        <div class="note-title">No notes found</div>
+                        <div class="note-desc">Create your first note to get started.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const notesHTML = notes.map(note => `
+                <div class="note-card">
+                    <div class="note-title">${escapeHtml(note.title || 'Untitled Note')}</div>
+                    <div class="note-meta">
+                        ${note.course ? `<span><i class="fas fa-book"></i> ${escapeHtml(note.course)}</span>` : ''}
+                        ${note.subject ? `<span><i class="fas fa-tag"></i> ${escapeHtml(note.subject)}</span>` : ''}
+                        ${note.year ? `<span><i class="fas fa-calendar"></i> ${escapeHtml(note.year.toString())}</span>` : ''}
+                    </div>
+                    <div class="note-desc">${escapeHtml(note.description || 'No description')}</div>
+                    <div class="note-actions">
+                        <button class="btn btn-primary" onclick="openViewModal('${note._id}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-primary" onclick="openUpdateModal('${note._id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="openDeleteModal('${note._id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('notesContainer').innerHTML = notesHTML;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
-
-        // Upload Note
-        uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const title = document.getElementById("noteTitle").value.trim();
-            const description = document.getElementById("noteDescription").value.trim();
-            const fileInput = document.getElementById("noteFile");
-            const file = fileInput.files.length > 0 ? fileInput.files[0] : null;
-            
-            if (!title) {
-                showMessage(uploadStatus, "Please provide a title for your note.", true);
-                return;
-            }
-            
-            let formData = new FormData();
-            formData.append("title", title);
-            formData.append("description", description);
-            
-            if (file) {
-                formData.append("file", file);
-            }
-            
-            // Disable form during upload
-            const submitBtn = uploadForm.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Uploading...";
-            
-            fetch(`${API_URL}/upload`, {
-                method: "POST",
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                showMessage(uploadStatus, "Note uploaded successfully!");
-                uploadForm.reset();
-                getAllNotes();
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                showMessage(uploadStatus, "Failed to upload note. Please try again.", true);
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Upload Note";
-            });
-        });
-
-        // Get All Notes
-        function getAllNotes() {
-            loadingNotes.style.display = "block";
-            notesList.innerHTML = "";
-            
-            fetch(API_URL)
-            .then(handleResponse)
-            .then(data => {
-                console.log("Notes data:", data);
-                renderNotes(data);
-            })
-            .catch(error => {
-                console.error("Error fetching notes:", error);
-                showMessage(notesStatus, "Failed to load notes: " + error.message, true);
-            })
-            .finally(() => {
-                loadingNotes.style.display = "none";
-            });
-        }
-
-        // Handle API response consistently
-        function handleResponse(response) {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    try {
-                        // Try to parse as JSON to get error message
-                        const json = JSON.parse(text);
-                        throw new Error(json.message || `Server error: ${response.status}`);
-                    } catch (e) {
-                        // If parsing fails, use status text
-                        throw new Error(`Server error: ${response.status} ${response.statusText}`);
-                    }
-                });
-            }
-            
-            return response.json().catch(error => {
-                console.error("Error parsing JSON:", error);
-                throw new Error("Invalid response from server");
-            });
-        }
-
-        // Search Notes
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const query = document.getElementById("searchQuery").value.trim();
-            loadingNotes.style.display = "block";
-            notesList.innerHTML = "";
-            
-            fetch(`${API_URL}/search?title=${encodeURIComponent(query)}`)
-            .then(handleResponse)
-            .then(data => {
-                renderNotes(data);
-                if (data.length === 0) {
-                    showMessage(notesStatus, `No notes found matching "${query}"`);
-                }
-            })
-            .catch(error => {
-                console.error("Error searching notes:", error);
-                showMessage(notesStatus, "Search failed: " + error.message, true);
-            })
-            .finally(() => {
-                loadingNotes.style.display = "none";
-            });
-        });
-
-        // Delete Note
-        function deleteNote(id) {
-            if (!id) {
-                showMessage(notesStatus, "Invalid note ID", true);
-                return;
-            }
-            
-            const noteElement = document.querySelector(`.note[data-id="${id}"]`);
-            if (noteElement) {
-                noteElement.style.opacity = "0.5";
-            }
-            
-            fetch(`${API_URL}/${id}`, { 
-                method: "DELETE" 
-            })
-            .then(handleResponse)
-            .then(data => {
-                showMessage(notesStatus, "Note deleted successfully!");
-                if (noteElement) {
-                    noteElement.remove();
-                }
-                
-                // If no notes left, check if we need to show "no notes" message
-                if (notesList.children.length === 0) {
-                    notesList.innerHTML = '<div class="no-notes">No notes found.</div>';
-                }
-            })
-            .catch(error => {
-                console.error("Error deleting note:", error);
-                showMessage(notesStatus, "Failed to delete note: " + error.message, true);
-                if (noteElement) {
-                    noteElement.style.opacity = "1";
-                }
-            });
-        }
-
-        // Load notes when button is clicked
-        loadNotesBtn.addEventListener('click', getAllNotes);
-        
-        // Debug function to check communication with API
-        function checkApiConnection() {
-            console.log("Checking API connection...");
-            fetch(API_URL, { method: "GET" })
-                .then(response => {
-                    console.log("API Response Status:", response.status);
-                    return response.text();
-                })
-                .then(text => {
-                    try {
-                        const data = JSON.parse(text);
-                        console.log("API Response Data:", data);
-                    } catch (e) {
-                        console.log("API Response (not JSON):", text);
-                    }
-                })
-                .catch(error => {
-                    console.error("API Connection Error:", error);
-                });
-        }
-        
-        // Load notes automatically when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check API connection in console for debugging
-            checkApiConnection();
-            // Load notes automatically
-            getAllNotes();
-        });
     </script>
 </body>
 </html>

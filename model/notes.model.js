@@ -1,21 +1,17 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const NotesSchema = new mongoose.Schema({
-    title: {
-        type: String,
+const notesSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    description: { type: String },
+    notesText: { type: String },
+    images: {
+        public_id: { type: String },
+        url: { type: String }
     },
-    description: {
-        type: String
-    },
-    filePath: {
-        type: String,
-        required: true,
-    },
-    CreatedAt: {
-        type: Date,
-        default: Date.now,
-    },
+    date: { type: Date, default: Date.now },
+    course: { type: String, required: true },
+    year: { type: String, required: true },
+    subject: { type: String, required: true }
 });
 
-const Notes = mongoose.model('Notes', NotesSchema);
-export default Notes;
+export default mongoose.model('Note', notesSchema);
